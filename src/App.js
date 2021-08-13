@@ -1,50 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
 
 function App() {
   const [pocet, setPocet] = useState(0);
   const [pole, setPole] = useState([]);
 
-  useEffect(() => {
-    let availableWidthPx = document.getElementById("menu-section");
-    if (availableWidthPx) {
-      console.log(availableWidthPx.offsetWidth);
-    }
-  }, []);
-  const checked = (e) => {
+  const handleOnChange = (e) => {
+    const name = e.target.name;
     if (e.target.checked === true) {
       setPocet(pocet + 1);
       let radString = e.currentTarget.parentNode.parentNode.innerText;
       let sedadloString = e.target.value;
       let idSedadlo = e.target.id;
-      setPole(pole, pole.push({ idSedadlo, radString, sedadloString }));
+      setPole(pole, pole.push({ idSedadlo, radString, sedadloString, name }));
     } else {
       setPocet(pocet - 1);
       let radString = e.currentTarget.parentNode.parentNode.innerText;
       let sedadloString = e.target.value;
       let idSedadlo = e.target.id;
-      setPole(pole, pole.shift({ idSedadlo, radString, sedadloString }));
+      setPole(pole, pole.shift({ idSedadlo, radString, sedadloString, name }));
     }
+    return pole;
   };
 
-  const rad = () => {
+  const rad = (i) => {
     let radSedadiel = [];
     for (let j = 1; j <= 20; j++) {
+      let name = i + "rad" + j;
       radSedadiel.push(
         <td key={"j" + j}>
           <input
-            onChange={checked}
+            onClick={handleOnChange}
             type="checkbox"
-            name={j}
+            name={name}
             value={j}
-            id={"check" + Math.floor(Math.random().toFixed(4) * 10000)}
+            id={`check${name}`}
           ></input>
         </td>
       );
     }
     return radSedadiel;
   };
-  //STLPEC head
   const column = () => {
     let cols = [];
     for (let c = 0; c <= 20; c++) {
@@ -56,14 +52,13 @@ function App() {
     }
     return cols;
   };
-  //BODY hladisko
   const hladisko = () => {
     let miestaNaSedenie = [];
     for (let i = 1; i <= 10; i++) {
       miestaNaSedenie.push(
         <tr key={"i" + i}>
           {i}
-          {rad()}
+          {rad(i)}
         </tr>
       );
     }
@@ -71,7 +66,9 @@ function App() {
   };
   const handleRemove = (e) => {
     const remove = pole[e.target.value];
+    document.getElementById(remove.idSedadlo).checked = false
     setPole(pole.filter((item) => item !== remove));
+
   };
   return (
     <div className="App">
@@ -80,9 +77,8 @@ function App() {
           <thead>
             <tr>{column()}</tr>
           </thead>
-          <tbody>{hladisko()}</tbody>
-        <p>Počet vybratých miest: {pole.length}</p>
-
+          <tbody id='hladisko'>{hladisko()}</tbody>
+          <p>Počet vybraných miest: {pole.length}</p>
         </table>
         <aside>
           <ul>
@@ -100,7 +96,7 @@ function App() {
                   onClick={handleRemove}
                   style={{ marginLeft: "11px" }}
                 >
-                  zrusit
+                  zrušit
                 </button>
               </li>
             ))}
